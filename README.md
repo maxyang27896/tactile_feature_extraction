@@ -7,7 +7,7 @@ This repo contains code for tactile data collection with a vision-based tactile 
 This repository require the [Common Robot Interface](https://github.com/dexterousrobot/common_robot_interface) and [Video Stream Processor](https://github.com/dexterousrobot/video_stream_processor.git) repositories to be pre-installed. Please follow the instructions within these repos first. 
 
 ```
-git clone 
+git clone https://github.com/maxyang27896/tactile_feature_extraction.git
 pip install -e .
 ```
 
