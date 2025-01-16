@@ -19,7 +19,7 @@ flag = cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 print('Set resolution, ',flag)
 
 # Exposure
-flag = cam.set(cv2.CAP_PROP_EXPOSURE, -5)
+flag = cam.set(cv2.CAP_PROP_EXPOSURE, 312.5)
 print('Set exposure, ', flag)
 
 flag = cam.set(cv2.CAP_PROP_BRIGHTNESS, 64)

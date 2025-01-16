@@ -3,7 +3,7 @@ import os
 ROOT_PATH = os.path.join(os.path.dirname(__file__), 'saved_data')
 
 # Model Paths
-TIP_ID = 'tip_1'
+TIP_ID = 'test'
 BASE_DATA_PATH = os.path.join(ROOT_PATH, f"collect_{TIP_ID}_5D_surface")
 BASE_MODEL_PATH = os.path.join(ROOT_PATH, f"collect_{TIP_ID}_5D_surface", "model")
 

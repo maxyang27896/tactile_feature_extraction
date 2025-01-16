@@ -5,16 +5,14 @@ from ipdb import set_trace
 import math
 
 tcp = 65
-offset = 0              # For tips 1-4
-# offset = 6              # For tips 5 and 6
+offset = -5
 base_frame = (0, 0, 0, 0, 0, 0)  
 # base frame: x->front, y->right, z->up (higher z to make sure doesnt press into the table)
-work_frame = (473, -111, 60.75-offset, -180, 0, -90)            # For 0 degrees
-# work_frame = (473, -111, 66.75-offset, -180, 0, -90)            # For tips 5 and 6 (45 degrees)
+work_frame = (470, -111, 61-offset, -180, 0, -90)            # For 0 degrees
+# work_frame = (473, -111, 66.75-offset, -180, 0, -90)       # For tips 5 and 6 (45 degrees)
 # work_frame = (473, -40, 61-offset, -180, 0, -90)           # safe baseframe for testing, using a box
-tcp_x_offset = -1.5                 # For tips 1-4
-# tcp_x_offset = -1.75                 # For tips 5 and 6
-tcp_y_offset = 1.5
+tcp_x_offset = -2.5 
+tcp_y_offset = 1.25
 
 with AsyncRobot(SyncRobot(RTDEController(ip='192.11.72.20'))) as robot:
     time.sleep(1)
@@ -32,24 +30,24 @@ with AsyncRobot(SyncRobot(RTDEController(ip='192.11.72.20'))) as robot:
     print('Moved to home position')
     set_trace()
 
-    # Test ranges
-    try:
-        while True:
-            robot.linear_speed = 30
-            robot.move_linear((0, 0, 0, -28, 0, 0)) # Moved to x rotation lower
-            robot.move_linear((0, 0, 0, 0, 0, 0))
-            robot.move_linear((0, 0, 0, +28, 0, 0)) # Moved to x rotation higher
-            robot.move_linear((0, 0, 0, 0, 0, 0))
-            set_trace()
-    except:
-        print("Continung to y rotation")
+    # # Test ranges
+    # try:
+    #     while True:
+    #         robot.linear_speed = 30
+    #         robot.move_linear((0, 0, 0, -35, 0, 0)) # Moved to x rotation lower
+    #         robot.move_linear((0, 0, 0, 0, 0, 0))
+    #         robot.move_linear((0, 0, 0, +35, 0, 0)) # Moved to x rotation higher
+    #         robot.move_linear((0, 0, 0, 0, 0, 0))
+    #         set_trace()
+    # except:
+    #     print("Continung to y rotation")
 
     try:
         while True: 
             robot.linear_speed = 30
-            robot.move_linear((0, 0, 0, 0, -28, 0)) # Moved to y rotation lower
+            robot.move_linear((0, 0, 0, 0, -35, 0)) # Moved to y rotation lower
             robot.move_linear((0, 0, 0, 0, 0, 0))
-            robot.move_linear((0, 0, 0, 0, 28, 0)) # Moved to y rotation higher
+            robot.move_linear((0, 0, 0, 0, 35, 0)) # Moved to y rotation higher
             robot.move_linear((0, 0, 0, 0, 0, 0))
             set_trace()
     except:

@@ -208,7 +208,7 @@ if __name__ == '__main__':
     device = args.device
 
     # create the sensor
-    sensor = make_sensor(source=0)
+    sensor = make_sensor(source=1)
 
     for task in tasks:
         for model_type in models:

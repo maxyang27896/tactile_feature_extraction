@@ -7,8 +7,7 @@ import time
 
 from ipdb import set_trace
 
-from FiltDataGather import DataGather
-from sample_analysis import Analyser
+from gather_data import DataGatherer
 from cri.robot import SyncRobot, AsyncRobot
 from cri.controller import RTDEController
 
@@ -60,8 +59,8 @@ def collect(target_df, dataPath, resume_from, sleep_time, i):
             pose = row.loc['pose_1' : 'pose_6'].values.astype(float)
             move = row.loc['move_1' : 'move_6'].values.astype(float)
             print(f'pose for frame_{i} = {pose}')
-            # Add extra depth to account additional geomrtry in Rx direction
-            add_tap_depth = max((22 - abs(pose[3]))/22 * 1.5, 0.0)
+            # Add extra depth to account additional geomrtry in Rx direction, adding more depth from 0 deg to 22 deg
+            add_tap_depth = max((35 - abs(pose[3]))/35 * 2.75, 0.0)
             add_tap = [0,0,add_tap_depth,0,0,0]
             # print('Tap deep', add_tap_depth)
             tap = [0,0,pose[2] ,0,0,0]
@@ -92,8 +91,8 @@ def collect(target_df, dataPath, resume_from, sleep_time, i):
             pose = row.loc['pose_1' : 'pose_6'].values.astype(float)
             move = row.loc['move_1' : 'move_6'].values.astype(float)
             print(f'pose for frame_{i} = {pose}')
-            # Add extra depth to account additional geomrtry in Rx direction
-            add_tap_depth = max((22 - abs(pose[3]))/22 * 1.5, 0.0)
+            # Add extra depth to account additional geomrtry in Rx direction, adding more depth from 0 deg to 22 deg
+            add_tap_depth = max((35 - abs(pose[3]))/35 * 2.75, 0.0)
             add_tap = [0,0,add_tap_depth,0,0,0]
             # print('Tap deep', add_tap_depth)
             tap = [0,0,pose[2] ,0,0,0]
@@ -110,31 +109,27 @@ def collect(target_df, dataPath, resume_from, sleep_time, i):
             robot.move_linear((0, 0, -10, 0, 0, 0))
             # time.sleep(sleep_time)
 
-            sample_size = os.path.getsize(f'{dataPath}/time_series/sample_{i}.pkl') #check FT sensor is still working
+            # sample_size = os.path.getsize(f'{dataPath}/time_series/sample_{i}.pkl') #check FT sensor is still working
 
-            if sample_size < 55000:
-                dg.pause()
-                os.remove(f'{dataPath}/time_series/sample_{i}.pkl')
-                shutil.rmtree(f'{dataPath}/videos/sample_{i}')
-                print(f'sample {i} under threshold at {sample_size}, removed and exiting...')
-                break
+            # if sample_size < 55000:
+            #     dg.pause()
+            #     os.remove(f'{dataPath}/time_series/sample_{i}.pkl')
+            #     shutil.rmtree(f'{dataPath}/videos/sample_{i}')
+            #     print(f'sample {i} under threshold at {sample_size}, removed and exiting...')
+            #     break
 
             i = i+1   
         except:
             print(f'something went wrong sample_{i} - moving on...')
             break
 
-tcp = 65
-offset = 0                # For tips 0 degrees
-# offset = 6                  # For tips 45 and 90 degrees
+tcp = 65            # DONT CHANGE THIS VALUE, CHANgE "offset" INSTEAD!!!!
+offset = -5         # Change this value to adjust the height of the tcp. negative value moves tcp up closer to the robot
 base_frame = (0, 0, 0, 0, 0, 0)  
 # base frame: x->front, y->right, z->up (higher z to make sure doesnt press into the table)
-work_frame = (473, -111, 60.75-offset, -180, 0, -90)            #  0 degrees
-# work_frame = (473, -111, 66.75-offset, -180, 0, -90)            # For tips 45 and 90 degrees
-# work_frame = (473, -40, 61-offset, -180, 0, -90)           # safe baseframe for testing, using a box
-tcp_x_offset = -1.5                 # 0 degrees
-# tcp_x_offset = -1.75                 # For tips 45 degrees
-tcp_y_offset = 1.5
+work_frame = (470, -111, 61-offset, -180, 0, -90)
+tcp_x_offset = -2.5        # Change this value to adjust the tcp in the forward backward direction, negative value moves tcp away the robot
+tcp_y_offset = 1.25        # Change this value to adjust the tcp in the left right direction, negative value moves tcp to the right
 tcp_x = tcp_x_offset*math.sin(math.pi/4) + tcp_y_offset*math.cos(math.pi/4)
 tcp_y = tcp_x_offset*math.cos(math.pi/4) - tcp_y_offset*math.sin(math.pi/4)
 
@@ -143,10 +138,10 @@ resume_from = 0
 
 if resume_from == 0:
     resume = False
-    poses_rng = [[0, 0, 1.0, 28.0, 28.0, 0], [0, 0, 4.0, -28.0, -28.0, 0]]    # pose ranges (min values, max values)
-    num_poses = 3000
+    poses_rng = [[0, 0, 0.0, 0, 0, 0], [0, 0, 0, 0, -0, 0]]    # pose ranges (min values, max values)
+    num_poses = 5
     num_frames = 1
-    moves_rng = [[2, 2, 0, 0, 0, 0], [-2, -2, 0, 0, 0, 0]]    # Shear movements (min values, max values)
+    moves_rng = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]    # Shear movements (min values, max values)
     
     # Make data path
     folder = f"collect_{TIP_ID}_5D_surface" 
@@ -159,10 +154,9 @@ else:
     dataPath = BASE_DATA_PATH
     target_df = pd.read_csv(f'{dataPath}/targets.csv')
 
-with DataGather(resume=resume, dataPath=dataPath) as dg, AsyncRobot(SyncRobot(RTDEController(ip='192.11.72.20'))) as robot:
+with DataGatherer(resume=resume, dataPath=dataPath, time_series=False, display_image=True, FT_ip='192.168.1.1', resize=[False, (300,225)]) as dg, AsyncRobot(SyncRobot(RTDEController(ip='192.11.72.20'))) as robot:
 
     time.sleep(1)
-    analyse = Analyser(TIP_ID)
 
     # Setup robot (TCP, linear speed,  angular speed and coordinate frame):
     robot.tcp = (tcp_x, tcp_y, tcp + offset-0.25, 0, 0, -45) 
